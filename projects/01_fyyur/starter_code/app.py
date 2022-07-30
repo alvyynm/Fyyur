@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+from enum import unique
 import json
 import dateutil.parser
 import babel
@@ -11,6 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy import DateTime, ForeignKey
 from forms import *
 from flask_migrate import Migrate
 
@@ -29,10 +31,26 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+shows = db.Table('shows',
+    db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
+    db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
+)
+
+
+class Association(db.Model):
+    __tablename__ = "shows"
+    __table_args__ = {'extend_existing': True}
+    artist_id = db.Column(ForeignKey("Artist.id"), primary_key=True)
+    venue_id = db.Column(ForeignKey("Venue.id"), primary_key=True)
+    artist_name = db.Column(db.String, ForeignKey("Artist.name"))
+    venue_name = db.Column(db.String, ForeignKey("Venue.name"))
+    artist_image_link = db.Column(db.String, ForeignKey("Artist.image_link"))
+    start_time = db.Column(db.DateTime)
+    venue = db.relationship("Venue", back_populates="artists")
+    artist = db.relationship("Artist", back_populates="venues")
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     city = db.Column(db.String(120))
@@ -49,12 +67,12 @@ class Venue(db.Model):
     upcoming_shows = db.Column(ARRAY(db.String()))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
+    artists = db.relationship("Association", back_populates="venue")
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     city = db.Column(db.String(120))
@@ -70,7 +88,11 @@ class Artist(db.Model):
     upcoming_shows = db.Column(ARRAY(db.String()))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
-
+    __table_args__ = (
+        db.PrimaryKeyConstraint(id, image_link),
+        {},
+    )
+    venues = db.relationship("Association", back_populates="artist")
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
