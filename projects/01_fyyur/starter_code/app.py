@@ -31,28 +31,20 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-shows = db.Table('shows',
-    db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-    db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
-)
+# shows = db.Table('shows',
+#     db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
+#     db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
+# )
 
-
-class Association(db.Model):
-    __tablename__ = "shows"
-    __table_args__ = {'extend_existing': True}
-    artist_id = db.Column(ForeignKey("Artist.id"), primary_key=True)
-    venue_id = db.Column(ForeignKey("Venue.id"), primary_key=True)
-    artist_name = db.Column(db.String, ForeignKey("Artist.name"))
-    venue_name = db.Column(db.String, ForeignKey("Venue.name"))
-    artist_image_link = db.Column(db.String, ForeignKey("Artist.image_link"))
-    start_time = db.Column(db.DateTime)
-    venue = db.relationship("Venue", back_populates="artists")
-    artist = db.relationship("Artist", back_populates="venues")
+# Show = db.Table('shows',
+#   db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
+#   db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
+#   db.Column('start_time', TIMESTAMP(timezone=True)))
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String,  unique=True, nullable=False)
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
@@ -74,12 +66,12 @@ class Venue(db.Model):
 class Artist(db.Model):
     __tablename__ = 'Artist'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, unique=True, nullable=False)
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     genres = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
+    image_link = db.Column(db.String(500), unique=True, nullable=False)
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
@@ -88,11 +80,20 @@ class Artist(db.Model):
     upcoming_shows = db.Column(ARRAY(db.String()))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
-    __table_args__ = (
-        db.PrimaryKeyConstraint(id, image_link),
-        {},
-    )
     venues = db.relationship("Association", back_populates="artist")
+
+class Association(db.Model):
+    __tablename__ = "shows"
+    __table_args__ = {'extend_existing': True}
+    artist_id = db.Column(ForeignKey("Artist.id"), primary_key=True)
+    venue_id = db.Column(ForeignKey("Venue.id"), primary_key=True)
+    artist_name = db.Column(ForeignKey("Artist.name"))
+    venue_name = db.Column(ForeignKey("Venue.name"))
+    artist_image_link = db.Column(ForeignKey("Artist.image_link"))
+    start_time = db.Column(db.DateTime)
+    venue = db.relationship("Venue", back_populates="artists")
+    artist = db.relationship("Artist", back_populates="venues")
+
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
