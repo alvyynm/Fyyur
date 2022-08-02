@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 037f38208065
+Revision ID: f508af0fa667
 Revises: 
-Create Date: 2022-08-01 09:01:27.277065
+Create Date: 2022-08-01 11:41:52.264140
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '037f38208065'
+revision = 'f508af0fa667'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,9 +29,9 @@ def upgrade():
     sa.Column('facebook_link', sa.String(length=120), nullable=True),
     sa.Column('seeking_venue', sa.Boolean(), nullable=True),
     sa.Column('seeking_description', sa.String(length=150), nullable=True),
-    sa.Column('image_link', sa.String(length=500), nullable=False),
-    sa.Column('past_shows', postgresql.ARRAY(sa.String()), nullable=True),
-    sa.Column('upcoming_shows', postgresql.ARRAY(sa.String()), nullable=True),
+    sa.Column('image_link', sa.String(length=800), nullable=False),
+    sa.Column('past_shows', postgresql.JSON(astext_type=sa.Text()), nullable=True),
+    sa.Column('upcoming_shows', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('past_shows_count', sa.Integer(), nullable=True),
     sa.Column('upcoming_shows_count', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -50,9 +50,9 @@ def upgrade():
     sa.Column('facebook_link', sa.String(length=120), nullable=True),
     sa.Column('seeking_talent', sa.Boolean(), nullable=True),
     sa.Column('seeking_description', sa.String(length=150), nullable=True),
-    sa.Column('image_link', sa.String(length=500), nullable=True),
-    sa.Column('past_shows', postgresql.ARRAY(sa.String()), nullable=True),
-    sa.Column('upcoming_shows', postgresql.ARRAY(sa.String()), nullable=True),
+    sa.Column('image_link', sa.String(length=800), nullable=True),
+    sa.Column('past_shows', postgresql.JSON(astext_type=sa.Text()), nullable=True),
+    sa.Column('upcoming_shows', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('past_shows_count', sa.Integer(), nullable=True),
     sa.Column('upcoming_shows_count', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -63,7 +63,7 @@ def upgrade():
     sa.Column('venue_name', sa.String(), nullable=True),
     sa.Column('artist_id', sa.Integer(), nullable=False),
     sa.Column('artist_name', sa.String(), nullable=True),
-    sa.Column('artist_image_link', sa.String(length=500), nullable=True),
+    sa.Column('artist_image_link', sa.String(length=800), nullable=True),
     sa.Column('start_time', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['artist_id'], ['Artist.id'], ),
     sa.ForeignKeyConstraint(['artist_image_link'], ['Artist.image_link'], ),

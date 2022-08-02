@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+from email.policy import default
 from enum import unique
 import json
 import dateutil.parser
@@ -17,6 +18,8 @@ from forms import *
 from flask_migrate import Migrate
 
 from sqlalchemy.dialects.postgresql import ARRAY
+from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSON
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -54,9 +57,9 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(150))
-    image_link = db.Column(db.String(500))
-    past_shows = db.Column(ARRAY(db.String()))
-    upcoming_shows = db.Column(ARRAY(db.String()))
+    image_link = db.Column(db.String(800))
+    past_shows = db.Column(JSON)
+    upcoming_shows = db.Column(JSON)
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
     artists = db.relationship("Association", back_populates="venue")
@@ -75,9 +78,9 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(150))
-    image_link = db.Column(db.String(500), unique=True, nullable=False)
-    past_shows = db.Column(ARRAY(db.String()))
-    upcoming_shows = db.Column(ARRAY(db.String()))
+    image_link = db.Column(db.String(800), unique=True, nullable=False)
+    past_shows = db.Column(JSON)
+    upcoming_shows = db.Column(JSON)
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
     venues = db.relationship("Association", back_populates="artist")
@@ -90,7 +93,7 @@ class Association(db.Model):
     artist_id = db.Column(ForeignKey("Artist.id"), primary_key=True)
     artist_name = db.Column(ForeignKey("Artist.name"))
     artist_image_link = db.Column(ForeignKey("Artist.image_link"))
-    start_time = db.Column(db.DateTime)
+    start_time = db.Column(db.DateTime, default=datetime.utcnow)
     venue = db.relationship("Venue", back_populates="artists")
     artist = db.relationship("Artist", back_populates="venues")
 
